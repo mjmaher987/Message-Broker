@@ -1,4 +1,4 @@
-# Kafka
+# Message Broker
 
 ## Hierarchy
 - Container (has 1 queue)
