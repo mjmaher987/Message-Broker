@@ -1,20 +1,41 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from models import *
 from server import *
-from django.http import HttpResponse
+import json 
 
-
-def became_leader(request):
+def message(request):
     if request.method == 'POST':
-        #  = request.data
-        Server().is_leader = True
-        return HttpResponse(status=200)
+        message = json.loads(request.data)
+        if 'type' in message:
+            if message['type'] == 'became_leader':
+                nodes = message['data']
+                Server().is_leader = True
+                Server().nodes = nodes
+                return HttpResponse(status=200)
+            elif message['type'] == 'forward':
+                message = message['data']
+                message = Message.objects.create(key=message['key'], value=message['value'])
+                return HttpResponse(status=200)
+            elif message['type'] == 'pull':
+                message = Message.objects.filter(pulled=False).earliest('timestamp')
+                message.pulled = True
+                message.save()
+                return HttpResponse(content=message, status=200)
     return HttpResponse(status=403)
 
 def push(request):
     if request.method == 'POST':
         key = request.POST['key']
         value = request.POST['value']
+        Server().forward_message({'key': key, 'value': value})
+        return HttpResponse(status=200)
+    return HttpResponse(status=403)
 
-        server = Server()
+def pull(request):
+    if request.method == 'POST':
+        message = Server().get_message()
+        return HttpResponse(content=message, status=200)
+    return HttpResponse(status=403)
+
         

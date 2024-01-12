@@ -1,6 +1,8 @@
 from coordinator.websocket_manager import WebsocketManager
 from coordinator.websocket_manager import Singleton
+from django.conf import settings
 from models import *
+import requests
 import json
 
 
@@ -21,11 +23,13 @@ class Coordinator(metaclass=Singleton):
             leader.is_leader = True
             leader.nodes = alive_nodes
             leader.save()
-            self.notify_node(leader, {'type': 'became_leader', 'data': json.loads(leader.nodes)})
+            self.notify_node(leader, json.dumps({'type': 'became_leader', 'data': [node.ip for node in leader.nodes]}))
 
     def notify_node(self, node, message):
-        id = node.id
-        WebsocketManager.send_message_to_node(id, message)
+        # id = node.id
+        # WebsocketManager.send_message_to_node(id, message)
+        requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message', data=message)
+        
 
     def add_node(self, ip):
         node, created = Node.objects.get_or_create(ip=ip)

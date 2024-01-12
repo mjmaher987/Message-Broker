@@ -1,6 +1,10 @@
 from threading import Lock
 from models import Message
+import requests
 import hashlib
+import json
+import queue
+from django.conf import settings
 
 
 class Singleton(type):
@@ -21,12 +25,22 @@ class Server(metaclass=Singleton):
         self.is_leader = False
         self.nodes = []
         self.pair = None
+        self.nodes_queue = queue.Queue()
 
-    def forward_message(self, message: Message):
+    def forward_message(self, message):
         if not self.is_leader:
             return
-        key_hash = hashlib.sha256(message.key.encode()).digest()
-        nodes = self.nodes.all().order_by('ip')
-        node = nodes[key_hash[0] % len(nodes)]
+        key_hash = hashlib.sha256(message['key'].encode()).digest()
+        nodes = sorted(self.nodes)
+        node_ip = nodes[key_hash[0] % len(nodes)]
+        response = requests.post(f'http://{node_ip}:{settings.NODE_PORT}/message', data=json.dumps({'type': 'forward', 'data': message}))
+        if response.status_code == 200:
+            self.nodes_queue.put(node_ip)
+
+    def get_message(self):
+        if not self.is_leader:
+            return None
         
-        # todo: send message
+        node_ip = self.nodes_queue.get()
+        response = requests.post(f'http://{node_ip}:{settings.NODE_PORT}/message', data=json.dumps({'type': 'pull'}))
+        return response.content
