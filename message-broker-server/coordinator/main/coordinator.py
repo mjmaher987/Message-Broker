@@ -19,12 +19,12 @@ class Coordinator(metaclass=Singleton):
             leader = alive_nodes.order_by('?').first()
             leader.is_leader = True
             leader.save()
-            self.notify_node(leader, json.dumps({'type': 'became_leader', 'data': [node.ip for node in alive_nodes]}))
+            self.notify_node(leader, {'type': 'became_leader', 'data': [node.ip for node in alive_nodes]})
 
     def notify_node(self, node, message):
         # id = node.id
         # WebsocketManager.send_message_to_node(id, message)
-        requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message', data=message)
+        requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message/', data=message)
         
 
     def add_node(self, ip):
@@ -39,7 +39,7 @@ class Coordinator(metaclass=Singleton):
         if not leader:
             self.set_leader()
             leader = self.get_leader()
-        self.notify_node(leader, json.dumps({'type': 'node_added', 'data': ip}))
+        self.notify_node(leader, {'type': 'node_added', 'data': ip})
         return node
 
     def get_leader(self):

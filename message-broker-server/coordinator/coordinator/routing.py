@@ -3,10 +3,10 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.urls import re_path
 
-import consumers
+from .consumers import WSConsumer
 
 websocket_patterns = [
-    re_path(r'ws/(?P<username>\w+)/$', consumers.WSConsumer.as_asgi())
+    re_path(r'ws/', WSConsumer.as_asgi())
 ]
 
 application = ProtocolTypeRouter(

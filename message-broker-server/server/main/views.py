@@ -4,27 +4,25 @@ from .server import *
 import json 
 
 def message(request):
-    if request.method == 'POST':
-        message = json.loads(request.data)
-        if 'type' in message:
-            if message['type'] == 'became_leader':
-                nodes = message['data']
-                Server().is_leader = True
-                Server().nodes = nodes
-                return HttpResponse(status=200)
-            elif message['type'] == 'node_added':
-                node = message['data']
-                Server().nodes.append(node)
-                return HttpResponse(status=200)
-            elif message['type'] == 'forward':
-                message = message['data']
-                message = Message.objects.create(key=message['key'], value=message['value'])
-                return HttpResponse(status=200)
-            elif message['type'] == 'pull':
-                message = Message.objects.filter(pulled=False).earliest('timestamp')
-                message.pulled = True
-                message.save()
-                return HttpResponse(content=message, status=200)
+    message = request.POST
+    if message['type'] == 'became_leader':
+        nodes = message['data']
+        Server().is_leader = True
+        Server().nodes = nodes
+        return HttpResponse(status=200)
+    elif message['type'] == 'node_added':
+        node = message['data']
+        Server().nodes.append(node)
+        return HttpResponse(status=200)
+    elif message['type'] == 'forward':
+        message = message['data']
+        message = Message.objects.create(key=message['key'], value=message['value'])
+        return HttpResponse(status=200)
+    elif message['type'] == 'pull':
+        message = Message.objects.filter(pulled=False).earliest('timestamp')
+        message.pulled = True
+        message.save()
+        return HttpResponse(content=message, status=200)
     return HttpResponse(status=403)
 
 def push(request):

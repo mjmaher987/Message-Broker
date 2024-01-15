@@ -5,7 +5,7 @@ import os
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from websocket_manager import *
+from .websocket_manager import *
 
 auth_cookie_name = os.getenv('WS_AUTH_COOKIE_NAME')
 
@@ -14,11 +14,11 @@ class WSConsumer(AsyncWebsocketConsumer):
     ping_interval: int = 10
     connected: bool
     session_id: int
-    id: int
+    id: str
 
     async def connect(self):
         self.session_id = random.randint(0, 10000000000)
-        self.id = int(self.scope['cookies']['id'])
+        self.id = str(self.scope['cookies']['id'])
         await self.channel_layer.group_add(self.id, self.channel_name)
         await self.accept()
         WebsocketManager().add_session(self.id)
