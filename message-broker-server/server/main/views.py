@@ -1,7 +1,6 @@
-from django.shortcuts import render
 from django.http import HttpResponse
-from models import *
-from server import *
+from .models import *
+from .server import *
 import json 
 
 def message(request):
@@ -12,6 +11,10 @@ def message(request):
                 nodes = message['data']
                 Server().is_leader = True
                 Server().nodes = nodes
+                return HttpResponse(status=200)
+            elif message['type'] == 'node_added':
+                node = message['data']
+                Server().nodes.append(node)
                 return HttpResponse(status=200)
             elif message['type'] == 'forward':
                 message = message['data']

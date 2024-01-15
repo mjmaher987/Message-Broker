@@ -1,10 +1,10 @@
+from django.conf import settings
 from threading import Lock
-from models import Message
+from .models import Message
 import requests
 import hashlib
 import json
 import queue
-from django.conf import settings
 
 
 class Singleton(type):

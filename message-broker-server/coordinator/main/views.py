@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from coordinator.websocket_manager import WebsocketManager
-from coordinator import Coordinator
+from .coordinator import Coordinator
 from django.http import HttpResponse
 
 

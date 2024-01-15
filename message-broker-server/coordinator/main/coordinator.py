@@ -1,29 +1,25 @@
 from coordinator.websocket_manager import WebsocketManager
 from coordinator.websocket_manager import Singleton
 from django.conf import settings
-from models import *
+from .models import *
 import requests
 import json
 
 
 class Coordinator(metaclass=Singleton):
     def __init__(self):
-        ip = '127.0.0.1'
+        self.ip = '127.0.0.1'
         # todo: remove node
 
     def set_leader(self):
         leader = self.get_leader()
-        if leader:
-            leader.nodes = None
-            leader.save()
         alive_nodes = self.get_alive_nodes()
         if alive_nodes:
             alive_nodes.update(is_leader=False)
             leader = alive_nodes.order_by('?').first()
             leader.is_leader = True
-            leader.nodes = alive_nodes
             leader.save()
-            self.notify_node(leader, json.dumps({'type': 'became_leader', 'data': [node.ip for node in leader.nodes]}))
+            self.notify_node(leader, json.dumps({'type': 'became_leader', 'data': [node.ip for node in alive_nodes]}))
 
     def notify_node(self, node, message):
         # id = node.id
@@ -43,9 +39,8 @@ class Coordinator(metaclass=Singleton):
         if not leader:
             self.set_leader()
             leader = self.get_leader()
-        leader.add_node(node)
+        self.notify_node(leader, json.dumps({'type': 'node_added', 'data': ip}))
         return node
-        # todo: notify leader
 
     def get_leader(self):
         return Node.objects.filter(is_leader=True).first()
