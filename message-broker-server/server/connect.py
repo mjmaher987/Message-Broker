@@ -33,13 +33,14 @@ class Node:
             return
         data = json.loads(message)
         if 'type' in data:
-            self.logger.info('WS received:', data)
             if data['type'] == 'ping':
                 ws.send(json.dumps({'type': 'pong'}))
                 return
-            elif data['type'] == 'send_message':
-                message = data['message']
-                # m_type = message['type']
+            else:
+                self.logger.info('WS received:', data)
+            # elif data['type'] == 'send_message':
+            #     message = data['message']
+            #     # m_type = message['type']
 
     def on_error(self, ws, error):
         self.logger.error(error)
