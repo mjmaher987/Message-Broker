@@ -1,32 +1,67 @@
 package sad.project;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.BlockingQueue;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-public class Producer implements Runnable {
-    private final BlockingQueue<Message> queue;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-    public Producer(BlockingQueue<Message> queue) {
-        this.queue = queue;
-    }
-
-    @Override
-    public void run() {
+public class Producer {
+    public void push(Message message) {
         try {
-            while (true) {
-                Message message = createMessage();
-                queue.put(message);
-                Thread.sleep(1000);
+            // Convert Message to JSON using Gson
+            Gson gson = new GsonBuilder().create();
+            String jsonBody = gson.toJson(message);
+
+            // Define the API endpoint
+            URL url = new URL("https://jsonplaceholder.typicode.com/posts");
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Set up the request
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setDoOutput(true);
+
+            // Write the JSON request body to the connection
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.write(jsonBody.getBytes());
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+
+            // Get the response code
+            int responseCode = connection.getResponseCode();
+            System.out.println("Response Code: " + responseCode);
+
+            // Read the response from the API
+            BufferedReader reader;
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            }
+
+            // Read the response body
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+
+            // Print the response body
+            System.out.println("Response Body:");
+            System.out.println(response);
+
+            // Close the connection
+            connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private Message createMessage() {
-//        It depends on the server
-        String data = "Hello from the Producer!";
-        LocalDateTime timeArrived = LocalDateTime.now();
-        return new Message(data, timeArrived);
-    }
 }
