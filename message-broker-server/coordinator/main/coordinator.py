@@ -29,12 +29,13 @@ class Coordinator(metaclass=Singleton):
 
     def add_node(self, ip):
         node, created = Node.objects.get_or_create(ip=ip)
+        node.is_alive = True
         pair = self.get_available_pair(ip)
         if pair:
             node.pair = pair
             pair.pair = node
             pair.save()
-            node.save()
+        node.save()
         leader = self.get_leader()
         if not leader:
             self.set_leader()
