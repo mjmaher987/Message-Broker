@@ -1,4 +1,5 @@
 import websocket
+# from websocket import WebSocketApp
 import argparse
 import threading
 import logging
@@ -55,13 +56,13 @@ class Node:
         response = requests.post(self.base_url + '/connect/')
         if response.status_code == 200:
             self.id = json.loads(response.content)
-        
+
             self.ws = websocket.WebSocketApp(f'{self.ws_url}/',
-                                            cookie=f'id={self.id}',
-                                            on_message=self.on_message,
-                                            on_error=self.on_error,
-                                            on_close=self.on_close,
-                                            on_open=self.on_open)
+                                             cookie=f'id={self.id}',
+                                             on_message=self.on_message,
+                                             on_error=self.on_error,
+                                             on_close=self.on_close,
+                                             on_open=self.on_open)
             wst = threading.Thread(target=self.ws.run_forever)
             wst.daemon = True
             wst.start()
@@ -69,7 +70,7 @@ class Node:
                 pass
         else:
             self.logger.error('Could not establish a connection')
-    
+
 
 if __name__ == '__main__':
     args = parse_args()
