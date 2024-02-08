@@ -12,4 +12,4 @@ class Node(models.Model):
         self.save()
 
     def __str__(self):
-        return self.ip + self.is_alive
+        return f'{self.ip}: {self.is_alive}'
