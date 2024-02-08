@@ -4,7 +4,7 @@ from .server import *
 import json 
 
 def message(request):
-    message = request.POST
+    message = json.loads(request.body)
     print(message)
     if message['type'] == 'became_leader':
         nodes = message['data']

@@ -24,7 +24,7 @@ class Coordinator(metaclass=Singleton):
     def notify_node(self, node, message):
         # id = node.id
         # WebsocketManager.send_message_to_node(id, message)
-        requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message/', data=message)
+        requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message/', json=message)
         
 
     def add_node(self, ip):
