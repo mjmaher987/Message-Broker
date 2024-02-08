@@ -28,9 +28,14 @@ def message(request):
 
 def push(request):
     if request.method == 'POST':
-        key = request.POST['key']
-        value = request.POST['value']
+        message = json.loads(request.body)
+        print('#####')
+        print(message)
+        key = message['key']
+        value = message['value']
+        print('!!!!!!')
         Server().forward_message({'key': key, 'value': value})
+        print('^^^^^^^^')
         return HttpResponse(status=200)
     return HttpResponse(status=403)
 

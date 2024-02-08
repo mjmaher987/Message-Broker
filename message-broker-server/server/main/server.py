@@ -33,7 +33,11 @@ class Server(metaclass=Singleton):
         key_hash = hashlib.sha256(message['key'].encode()).digest()
         nodes = sorted(self.nodes)
         node_ip = nodes[key_hash[0] % len(nodes)]
+        # print('*****')
+        print(node_ip)
+        # message['value'] = message['value'].encode()
         response = requests.post(f'http://{node_ip}:{settings.NODE_PORT}/message/', data=json.dumps({'type': 'forward', 'data': message}))
+        print(response)
         if response.status_code == 200:
             self.nodes_queue.put(node_ip)
 
