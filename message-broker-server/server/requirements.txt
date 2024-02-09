@@ -1,0 +1,5 @@
+django==4.2.2
+python_dotenv==1.0.0
+channels[daphne]==4.0.0
+websocket-client
+requests

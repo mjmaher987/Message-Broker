@@ -14,7 +14,8 @@ def message(request):
         return HttpResponse(status=200)
     elif message['type'] == 'node_added':
         node = message['data']
-        Server().nodes.append(node)
+        if not node in Server().nodes:
+            Server().nodes.append(node)
         return HttpResponse(status=200)
     elif message['type'] == 'forward':
         message = message['data']
