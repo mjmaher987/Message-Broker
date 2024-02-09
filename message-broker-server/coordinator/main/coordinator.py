@@ -42,9 +42,15 @@ class Coordinator(metaclass=Singleton):
             leader = self.get_leader()
         self.notify_node(leader, {'type': 'node_added', 'data': ip})
         return node
+    
+    def remove_node(self, id):
+        node = Node.objects.filter(id=id).first()
+        if node:
+            node.is_alive = False
+            node.save()
 
     def get_leader(self):
-        return Node.objects.filter(is_leader=True).first()
+        return Node.objects.filter(is_leader=True, is_alive=True).first()
     
     def get_alive_nodes(self):
         return Node.objects.filter(is_alive=True)
