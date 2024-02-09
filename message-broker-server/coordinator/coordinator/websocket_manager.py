@@ -18,12 +18,14 @@ class Singleton(type):
 class WebsocketManager(metaclass=Singleton):
     def __init__(self):
         self.sessions = set()
-        pass
 
     def add_session(self, session_id):
+        print('Added', session_id)
         self.sessions.add(session_id)
-
+        coordinator.Coordinator().notify_leader(session_id)
+    
     def remove_session(self, session_id):
+        print('Removed', session_id)
         coordinator.Coordinator().remove_node(session_id)
         self.sessions.remove(session_id)
 

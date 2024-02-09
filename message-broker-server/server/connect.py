@@ -22,6 +22,7 @@ class Node:
         self.coordinator_ip = coordinator_ip
         self.coordinator_port = coordinator_port
         self.base_url = f'http://{self.coordinator_ip}:{self.coordinator_port}'
+        self.node_url = f'http://127.0.0.1:8000'
         self.ws_url = f'ws://{self.coordinator_ip}:{self.coordinator_port}/ws'
 
         logging.basicConfig(filename='client.log', level=logging.DEBUG,
@@ -36,11 +37,10 @@ class Node:
             if data['type'] == 'ping':
                 ws.send(json.dumps({'type': 'pong'}))
                 return
-            else:
-                self.logger.info('WS received:', data)
-            # elif data['type'] == 'send_message':
-            #     message = data['message']
-            #     # m_type = message['type']
+            elif data['type'] == 'send_message':
+                self.logger.info('WS Received:', data)
+                message = data['message']
+                requests.post(self.node_url + '/message/', json=message)
 
     def on_error(self, ws, error):
         self.logger.error(error)

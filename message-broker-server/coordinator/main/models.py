@@ -8,4 +8,4 @@ class Node(models.Model):
     pair = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f'{self.ip}: {self.is_alive}'
+        return f'{self.id}: {self.is_alive}'
