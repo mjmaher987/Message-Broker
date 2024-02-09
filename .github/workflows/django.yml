@@ -30,15 +30,18 @@ jobs:
 
     - name: Run Django migrations
       run: |
+        cd message-broker-server
         python manage.py migrate
 
     - name: Collect static files
       run: |
+        cd message-broker-server
         python manage.py collectstatic --noinput
 
     - name: Build Docker image
       run: |
-        docker build -t your-docker-image-name .
+        cd message-broker-server
+        docker build -t message-broker .
 
     - name: Push Docker image to Docker Hub
       uses: docker/build-push-action@v2
