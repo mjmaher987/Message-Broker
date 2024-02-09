@@ -3,7 +3,8 @@ name: Django Build and Docker Image
 on:
   push:
     branches:
-      - [main, feature/cicd]
+      - main
+      - feature/cicd
   pull_request:
     branches:
       - main
