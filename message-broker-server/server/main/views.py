@@ -3,6 +3,7 @@ from .models import *
 from .server import *
 import json 
 
+
 def message(request):
     message = json.loads(request.body)
     print(message)
@@ -26,6 +27,7 @@ def message(request):
         return HttpResponse(content=message, status=200)
     return HttpResponse(status=403)
 
+
 def push(request):
     if request.method == 'POST':
         message = json.loads(request.body)
@@ -38,6 +40,7 @@ def push(request):
         print('^^^^^^^^')
         return HttpResponse(status=200)
     return HttpResponse(status=403)
+
 
 def pull(request):
     if request.method == 'POST':
