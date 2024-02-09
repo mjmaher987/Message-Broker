@@ -1,5 +1,4 @@
 import websocket
-# from websocket import WebSocketApp
 import argparse
 import threading
 import logging

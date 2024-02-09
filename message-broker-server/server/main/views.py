@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from .models import *
 from .server import *
-import json 
+import json
 
 
 def message(request):
@@ -30,14 +30,9 @@ def message(request):
 
 def push(request):
     if request.method == 'POST':
-        message = json.loads(request.body)
-        print('#####')
-        print(message)
-        key = message['key']
-        value = message['value']
-        print('!!!!!!')
+        key = request.POST['key']
+        value = request.POST['value']
         Server().forward_message({'key': key, 'value': value})
-        print('^^^^^^^^')
         return HttpResponse(status=200)
     return HttpResponse(status=403)
 
@@ -48,4 +43,3 @@ def pull(request):
         return HttpResponse(content=message, status=200)
     return HttpResponse(status=403)
 
-        
