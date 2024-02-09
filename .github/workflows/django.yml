@@ -33,11 +33,6 @@ jobs:
         cd message-broker-server/server
         python manage.py migrate
 
-    - name: Collect static files
-      run: |
-        cd message-broker-server/server
-        python manage.py collectstatic --noinput
-
     - name: Build Docker image
       run: |
         cd message-broker-server/server
