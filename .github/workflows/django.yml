@@ -47,5 +47,5 @@ jobs:
         push: true
         tags: message-broker:latest
       env:
-        DOCKER_USERNAME: ${{ "test" }}
-        DOCKER_PASSWORD: ${{ "test" }}
+        DOCKER_USERNAME: test
+        DOCKER_PASSWORD: test
