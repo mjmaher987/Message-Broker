@@ -27,7 +27,6 @@ class WSConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         self.connected = False
-        # todo: remove node
         await self.channel_layer.group_discard(self.id, self.channel_name)
         WebsocketManager().remove_session(self.id)
 

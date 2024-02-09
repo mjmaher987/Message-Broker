@@ -3,13 +3,18 @@ from coordinator.websocket_manager import Singleton
 from django.conf import settings
 from .models import *
 import requests
-import json
+from asgiref.sync import sync_to_async
+
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest.settings')
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+django.setup()
 
 
 class Coordinator(metaclass=Singleton):
     def __init__(self):
         self.ip = '127.0.0.1'
-        # todo: remove node
 
     def set_leader(self):
         leader = self.get_leader()
@@ -42,6 +47,11 @@ class Coordinator(metaclass=Singleton):
             leader = self.get_leader()
         self.notify_node(leader, {'type': 'node_added', 'data': ip})
         return node
+    
+    @sync_to_async
+    def get_nodes_by_id(self, id):
+        print(id)
+        return list(Node.objects.filter(id=id))
     
     def remove_node(self, id):
         node = Node.objects.filter(id=id).first()
