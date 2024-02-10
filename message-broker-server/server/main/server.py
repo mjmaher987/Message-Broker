@@ -22,6 +22,7 @@ class Singleton(type):
 class Server(metaclass=Singleton):
     def __init__(self):
         self.ip = '127.0.0.1'
+        self.port = ''
         self.is_leader = False
         self.nodes = []
         self.pair = None
@@ -33,15 +34,26 @@ class Server(metaclass=Singleton):
         key_hash = hashlib.sha256(message['key'].encode()).digest()
         nodes = sorted(self.nodes)
         (node_ip, node_port) = nodes[key_hash[0] % len(nodes)]
-        response = requests.post(f'http://{node_ip}:{node_port}/message/',
-                                 data=json.dumps({'type': 'forward', 'data': message}))
-        if response.status_code == 200:
-            self.nodes_queue.put(node_ip)
+        if node_port == self.port:
+            Message.objects.create(key=message['key'], value=message['value'].encode())
+            self.nodes_queue.put((node_ip, node_port))
+        else:
+            response = requests.post(f'http://{node_ip}:{node_port}/message/',
+                                    data=json.dumps({'type': 'forward', 'data': message}))
+            if response.status_code == 200:
+                self.nodes_queue.put((node_ip, node_port))
 
     def get_message(self):
         if not self.is_leader:
             return None
 
         (node_ip, node_port) = self.nodes_queue.get()
-        response = requests.post(f'http://{node_ip}:{node_port}/message/', data=json.dumps({'type': 'pull'}))
-        return response.content
+        if node_port == self.port:
+            message = Message.objects.filter(pulled=False).earliest('timestamp')
+            message.pulled = True
+            message.save()
+            print(message)
+            return {'key': message.key, 'value': message.value}
+        else:
+            response = requests.post(f'http://{node_ip}:{node_port}/message/', data=json.dumps({'type': 'pull'}))
+            return response.json()

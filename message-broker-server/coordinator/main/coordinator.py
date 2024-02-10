@@ -24,7 +24,7 @@ class Coordinator(metaclass=Singleton):
             leader = alive_nodes.order_by('?').first()
             leader.is_leader = True
             leader.save()
-            self.notify_node(leader, {'type': 'became_leader', 'data': [(node.ip, node.port) for node in alive_nodes]})
+            self.notify_node(leader, {'type': 'became_leader', 'data': [(node.ip, node.port) for node in alive_nodes], 'port': leader.port})
 
     def notify_node(self, node, message):
         # id = node.id
@@ -45,7 +45,10 @@ class Coordinator(metaclass=Singleton):
         if not leader:
             self.set_leader()
             leader = self.get_leader()
-        self.notify_node(leader, {'type': 'node_added', 'data': (node.ip, node.port)})
+        if pair:
+            self.notify_node(leader, {'type': 'node_added', 'data': {'node': (node.ip, node.port), 'pair': (pair.ip, pair.port)}})
+        else:
+            self.notify_node(leader, {'type': 'node_added', 'data': {'node': (node.ip, node.port)}})
         return node
     
     @sync_to_async
@@ -55,6 +58,8 @@ class Coordinator(metaclass=Singleton):
     
     def remove_node(self, id):
         node = Node.objects.filter(id=id).first()
+        leader = self.get_leader()
+        self.notify_node(leader, {'type': 'node_removed', 'data': {'node': (node.ip, node.port)}})
         if node:
             node.is_alive = False
             node.save()
