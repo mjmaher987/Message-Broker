@@ -1,6 +1,7 @@
 from threading import Lock
 from channels.layers import get_channel_layer
 import base64
+from main import coordinator
 
 class Singleton(type):
     _instances = {}
@@ -23,6 +24,7 @@ class WebsocketManager(metaclass=Singleton):
         self.sessions.add(session_id)
 
     def remove_session(self, session_id):
+        coordinator.Coordinator().remove_node(session_id)
         self.sessions.remove(session_id)
 
     def get_connected_session_ids(self):
