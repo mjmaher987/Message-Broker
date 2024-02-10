@@ -24,17 +24,18 @@ class Coordinator(metaclass=Singleton):
             leader = alive_nodes.order_by('?').first()
             leader.is_leader = True
             leader.save()
-            self.notify_node(leader, {'type': 'became_leader', 'data': [node.ip for node in alive_nodes]})
+            self.notify_node(leader, {'type': 'became_leader', 'data': [(node.ip, node.port) for node in alive_nodes]})
 
     def notify_node(self, node, message):
         # id = node.id
         # WebsocketManager.send_message_to_node(id, message)
-        requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message/', json=message)
+        requests.post(f'http://{node.ip}:{node.port}/message/', json=message)
 
     def add_node(self, ip):
-        node, _ = Node.objects.get_or_create(ip=ip)
+        port = int(settings.NODE_PORT) + len(Node.objects.all())
+        node, _ = Node.objects.get_or_create(ip=ip, port=port)
         node.is_alive = True
-        pair = self.get_available_pair(ip)
+        pair = self.get_available_pair(ip, port)
         if pair:
             node.pair = pair
             pair.pair = node
@@ -44,7 +45,7 @@ class Coordinator(metaclass=Singleton):
         if not leader:
             self.set_leader()
             leader = self.get_leader()
-        self.notify_node(leader, {'type': 'node_added', 'data': ip})
+        self.notify_node(leader, {'type': 'node_added', 'data': (node.ip, node.port)})
         return node
     
     @sync_to_async
@@ -64,5 +65,5 @@ class Coordinator(metaclass=Singleton):
     def get_alive_nodes(self):
         return Node.objects.filter(is_alive=True)
     
-    def get_available_pair(self, ip):
-        return Node.objects.filter(is_alive=True, pair=None).exclude(ip=ip).first()
+    def get_available_pair(self, ip, port):
+        return Node.objects.filter(is_alive=True, pair=None).exclude(ip=ip, port=port).first()
