@@ -30,10 +30,9 @@ class Coordinator(metaclass=Singleton):
         # id = node.id
         # WebsocketManager.send_message_to_node(id, message)
         requests.post(f'http://{node.ip}:{settings.NODE_PORT}/message/', json=message)
-        
 
     def add_node(self, ip):
-        node, created = Node.objects.get_or_create(ip=ip)
+        node, _ = Node.objects.get_or_create(ip=ip)
         node.is_alive = True
         pair = self.get_available_pair(ip)
         if pair:

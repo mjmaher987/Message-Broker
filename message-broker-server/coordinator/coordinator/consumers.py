@@ -34,11 +34,7 @@ class WSConsumer(AsyncWebsocketConsumer):
         pass
 
     async def send_message(self, message):
-        to_send = {
-            'type': 'message',
-            'message': message
-        }
-        await self.send(text_data=to_send)
+        await self.send(text_data=json.dumps(message))
 
     async def send_bytes(self, bytes_data):
         to_send = bytes_to_b64(bytes_data)
