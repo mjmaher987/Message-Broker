@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
 public class Message {
     private String key;
     private String value;
-    private LocalDateTime time_arrived; // It is the arriving time of the message
+    private LocalDateTime time_arrived;
 }

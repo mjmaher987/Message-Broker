@@ -7,12 +7,15 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.function.Function;
 
 public class Consumer {
+    private final static String PULL_URL = "http://localhost:8000/pull";
+
     public Message pull() {
         Message message = null;
         try {
-            URL url = new URL("https://jsonplaceholder.typicode.com/posts/1");
+            URL url = new URL(PULL_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -37,5 +40,27 @@ public class Consumer {
         }
 
         return message;
+    }
+
+    public void subscribe(Function<Message, Void> function, long intervalMillis) {
+        Thread subscriberThread = getSubscriberThread(function, intervalMillis);
+        subscriberThread.start();
+    }
+
+
+    private Thread getSubscriberThread(final Function<Message, Void> function, final long intervalMillis) {
+        Thread subscriberThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Message message = pull();
+                    function.apply(message);
+
+                    Thread.sleep(intervalMillis);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return subscriberThread;
     }
 }
