@@ -29,6 +29,9 @@ def message(request):
         data = message['data']
         node = Node.objects.get(ip=data['node'][0], port=data['node'][1])
         node.is_alive = False
+        if node.pair:
+            node.pair.pair = None
+            node.pair.save()
         node.save()
         return HttpResponse(status=200)
     elif message['type'] == 'forward':
