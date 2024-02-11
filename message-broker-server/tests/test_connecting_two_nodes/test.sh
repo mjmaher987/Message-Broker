@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test for handling 2 nodes
+# Test for handling test_connecting_three_nodes nodes
 
 BASE_DIR=$(git rev-parse --show-toplevel)/message-broker-server
 

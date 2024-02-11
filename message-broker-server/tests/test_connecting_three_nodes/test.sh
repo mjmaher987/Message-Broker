@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test for handling 3 nodes
+# Test for handling test_fault_tolerance nodes
 
 BASE_DIR=$(git rev-parse --show-toplevel)/message-broker-server
 
@@ -42,7 +42,7 @@ python $BASE_DIR/server/connect.py &
 sleep 2
 echo $SETTING_PORT 'Connected!'
 
-python $BASE_DIR/tests/2/test.py
+python $BASE_DIR/tests/test_connecting_three_nodes/test.py
 
 rm -r $BASE_DIR/server/8000
 rm -r $BASE_DIR/server/8001
