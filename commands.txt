@@ -1,0 +1,27 @@
+Steps to use in PyCharm
+---------------------
+
+pip install django
+
+cd .\message-broker-server\
+
+pip install -r requirements.txt
+
+-----------------
+
+cd .\coordinator\ -> python manage.py migrate
+python manage.py runserver 127.0.0.1:8001
+
+cd server -> python manage.py migrate
+python manage.py runserver 127.0.0.1:8000
+
+
+cd server -> python connect.py
+
+
+create virtual env: python3.9 -m venv "my_environment"
+
+
+
+
+
