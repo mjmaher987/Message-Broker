@@ -1,7 +1,7 @@
 #!/bin/bash
 # Test for fault tolerance: Second node goes down, third one goes up and then goes down.
 
-BASE_DIR=/home/marmof/SAD/Message-Broker/message-broker-server
+BASE_DIR=$(git rev-parse --show-toplevel)/message-broker-server
 
 python $BASE_DIR/coordinator/manage.py flush --noinput
 python $BASE_DIR/coordinator/manage.py migrate

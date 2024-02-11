@@ -1,7 +1,7 @@
 #!/bin/bash
 # Test for handling 3 nodes
 
-BASE_DIR=/home/marmof/SAD/Message-Broker/message-broker-server
+BASE_DIR=$(git rev-parse --show-toplevel)/message-broker-server
 
 python $BASE_DIR/coordinator/manage.py flush --noinput
 python $BASE_DIR/coordinator/manage.py migrate
