@@ -27,7 +27,6 @@ class WSConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         self.connected = False
-        # todo: remove node
         await self.channel_layer.group_discard(self.id, self.channel_name)
         WebsocketManager().remove_session(self.id)
 
@@ -35,11 +34,7 @@ class WSConsumer(AsyncWebsocketConsumer):
         pass
 
     async def send_message(self, message):
-        to_send = {
-            'type': 'message',
-            'message': message
-        }
-        await self.send(text_data=to_send)
+        await self.send(text_data=json.dumps(message))
 
     async def send_bytes(self, bytes_data):
         to_send = bytes_to_b64(bytes_data)

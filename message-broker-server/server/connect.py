@@ -9,7 +9,7 @@ import requests
 def parse_args():
     parser = argparse.ArgumentParser(description='Server connection arguments')
     parser.add_argument('--coordinator_ip', type=str, default='127.0.0.1', help='IP address of the Coordinator')
-    parser.add_argument('--coordinator_port', type=str, default='8001', help='Port of the Coordinator')
+    parser.add_argument('--coordinator_port', type=str, default='7000', help='Port of the Coordinator')
     parser.add_argument('--coordinator_backup_ip', default=None, type=str, help='IP address of the backup Coordinator')
     parser.add_argument('--coordinator_backup_port', default=None, type=str, help='Port of the backup Coordinator')
     args = parser.parse_args()
