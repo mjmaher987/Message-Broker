@@ -33,6 +33,11 @@ jobs:
         cd message-broker-server/server
         python manage.py migrate
 
+    - name: Run Django tests
+      run: |
+        cd message-broker-server/server
+        python manage.py test
+
     - name: Build Docker image
       run: |
         cd message-broker-server/server
