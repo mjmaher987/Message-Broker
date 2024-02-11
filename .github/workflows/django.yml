@@ -41,9 +41,9 @@ jobs:
     - name: Run integration tests
       run: |
         cd message-broker-server/tests
-        bash /test_connecting_three_nodes/test.sh
-        bash /test_connecting_two_nodes/test.sh
-        bash /test_fault_tolerance/test.sh
+        bash test_connecting_three_nodes/test.sh
+        bash test_connecting_two_nodes/test.sh
+        bash test_fault_tolerance/test.sh
 
     - name: Build Docker image
       run: |
