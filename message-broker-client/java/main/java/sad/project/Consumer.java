@@ -10,14 +10,14 @@ import java.net.URL;
 import java.util.function.Function;
 
 public class Consumer {
-    private final static String PULL_URL = "http://localhost:8000/pull";
+    private final static String PULL_URL = "http://0.0.0.0:8000/pull/";
 
     public Message pull() {
         Message message = null;
         try {
             URL url = new URL(PULL_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            connection.setRequestMethod("POST");
 
             int responseCode = connection.getResponseCode();
             System.out.println("Response Code: " + responseCode);
@@ -31,9 +31,12 @@ public class Consumer {
             reader.close();
 
             Gson gson = new GsonBuilder().create();
+
+            if (response.toString().isEmpty()) {
+                return null;
+            }
             message = gson.fromJson(response.toString(), Message.class);
 
-            System.out.println(message.toString());
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,14 +45,14 @@ public class Consumer {
         return message;
     }
 
-    public void subscribe(Function<Message, Void> function, long intervalMillis) {
+    public <T> void subscribe(Function<Message, T> function, long intervalMillis) {
         Thread subscriberThread = getSubscriberThread(function, intervalMillis);
         subscriberThread.start();
     }
 
 
-    private Thread getSubscriberThread(final Function<Message, Void> function, final long intervalMillis) {
-        Thread subscriberThread = new Thread(() -> {
+    private <T> Thread getSubscriberThread(final Function<Message, T> function, final long intervalMillis) {
+        return new Thread(() -> {
             while (true) {
                 try {
                     Message message = pull();
@@ -61,6 +64,5 @@ public class Consumer {
                 }
             }
         });
-        return subscriberThread;
     }
 }

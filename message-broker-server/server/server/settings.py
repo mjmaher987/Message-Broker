@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # load environment variables
 load_dotenv()
 NODE_PORT = os.getenv('NODE_PORT')
+SETTING_PORT = os.getenv('SETTING_PORT')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -83,7 +84,7 @@ WSGI_APPLICATION = "server.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / SETTING_PORT / "db.sqlite3",
     }
 }
 

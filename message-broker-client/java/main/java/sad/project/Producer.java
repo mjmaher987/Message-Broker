@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Producer {
-    private final static String PUSH_URL = "http://localhost:8000/push";
+    private final static String PUSH_URL = "http://0.0.0.0:8000/push/";
 
     public void push(Message message) {
         try {
@@ -28,9 +28,6 @@ public class Producer {
 
             int responseCode = connection.getResponseCode();
             System.out.println("Response Code: " + responseCode);
-
-            String response = getResponse(responseCode, connection);
-            System.out.println(response);
 
             connection.disconnect();
         } catch (Exception e) {

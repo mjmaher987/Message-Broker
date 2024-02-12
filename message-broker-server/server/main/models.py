@@ -29,18 +29,20 @@ class Server(models.Model):
         if not self.is_leader:
             return
         key_hash = hashlib.sha256(message['key'].encode()).digest()
-        nodes = Node.objects.all().order_by('id')
+        nodes = Node.objects.filter(is_alive=True).order_by('id')
         node = nodes[key_hash[0] % len(nodes)]
         if node.port == self.port:
             Message.objects.create(key=message['key'], value=message['value'].encode())
-            requests.post(f'http://{node.pair.ip}:{node.pair.port}/message/',
-                                     data=json.dumps({'type': 'forward_replica', 'data': message}))
             NodeQueue.objects.create(ip=node.ip, port=node.port)
+            if node.pair:
+                requests.post(f'http://{node.pair.ip}:{node.pair.port}/message/',
+                                        data=json.dumps({'type': 'forward_replica', 'data': message}))
         else:
             response = requests.post(f'http://{node.ip}:{node.port}/message/',
                                      data=json.dumps({'type': 'forward', 'data': message}))
-            requests.post(f'http://{node.pair.ip}:{node.pair.port}/message/',
-                                     data=json.dumps({'type': 'forward_replica', 'data': message}))
+            if node.pair:
+                requests.post(f'http://{node.pair.ip}:{node.pair.port}/message/',
+                                        data=json.dumps({'type': 'forward_replica', 'data': message}))
             if response.status_code == 200:
                 NodeQueue.objects.create(ip=node.ip, port=node.port)
 
@@ -52,7 +54,8 @@ class Server(models.Model):
         if node:
             node_ip, node_port = node.ip, node.port
             real_node = Node.objects.get(ip=node_ip, port=node_port)
-            node_pair_ip, node_pair_port = real_node.pair.ip, real_node.pair.port
+            if real_node.pair:
+                node_pair_ip, node_pair_port = real_node.pair.ip, real_node.pair.port
             node.delete()
             if real_node.is_alive:
                 if node_port == self.port:
@@ -62,9 +65,10 @@ class Server(models.Model):
                     return {'key': message.key, 'value': message.value.decode()}
                 else:
                     response = requests.post(f'http://{node_ip}:{node_port}/message/', data=json.dumps({'type': 'pull'}))
-                    requests.post(f'http://{node_pair_ip}:{node_pair_port}/message/', data=json.dumps({'type': 'pull_replica'}))
+                    if real_node.pair:
+                        requests.post(f'http://{node_pair_ip}:{node_pair_port}/message/', data=json.dumps({'type': 'pull_replica'}))
                     return response.json()
-            else:
+            elif real_node.pair:
                 response = requests.post(f'http://{node_pair_ip}:{node_pair_port}/message/', data=json.dumps({'type': 'pull_replica'}))
                 return response.json()
         else:
