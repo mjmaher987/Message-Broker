@@ -20,6 +20,9 @@ cd server -> python connect.py
 
 
 create virtual env: python3.9 -m venv "my_environment"
+cd venv
+.\Scripts\activate
+
 
 
 

@@ -1,35 +1,23 @@
 import json
 import requests
+from Message import Message
+
 
 class Producer:
+    PUSH_URL = "http://0.0.0.0:8000/push/"
+
     def push(self, message):
         try:
-            # Convert Message to JSON
             json_body = json.dumps(message.__dict__)
 
-            # Define the API endpoint
-            url = "https://jsonplaceholder.typicode.com/posts"
-
-            # Set up the request
             headers = {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             }
 
-            # POST request
-            response = requests.post(url, data=json_body, headers=headers)
+            response = requests.post(self.PUSH_URL, data=json_body, headers=headers)
 
-            # Print response code
             print("Response Code:", response.status_code)
-
-            # Print response body
-            print("Response Body:")
-            print(response.text)
 
         except Exception as e:
             print(e)
-
-# Example usage
-# producer = Producer()
-# message = Message(key="example", value="test", time_arrived=datetime.now())
-# producer.push(message)
