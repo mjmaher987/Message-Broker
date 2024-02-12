@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/cicd
   pull_request:
     branches:
       - main
@@ -50,12 +49,12 @@ jobs:
         cd message-broker-server/server
         docker build -t message-broker .
 
-#    - name: Push Docker image to Docker Hub
-#      uses: docker/build-push-action@v2
-#      with:
-#        context: .
-#        push: true
-#        tags: message-broker:latest
-#      env:
-#        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Push Docker image to Docker Hub
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: message-broker:latest
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
