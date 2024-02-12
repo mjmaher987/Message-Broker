@@ -13,47 +13,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        cd message-broker-server/server
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          cd message-broker-server/server
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Run Django migrations
-      run: |
-        cd message-broker-server/server
-        python manage.py migrate
+      - name: Run Django migrations
+        run: |
+          cd message-broker-server/server
+          python manage.py migrate
 
-    - name: Run Django tests
-      run: |
-        cd message-broker-server/server
-        python manage.py test
+      - name: Run Django tests
+        run: |
+          cd message-broker-server/server
+          python manage.py test
 
-    # - name: Run integration tests
-    #   run: |
-    #     cd message-broker-server/tests
-    #     bash test_connecting_three_nodes/test.sh
-    #     bash test_connecting_two_nodes/test.sh
-    #     bash test_fault_tolerance/test.sh
+      - name: Run integration tests
+        run: |
+          cd message-broker-server/tests
+          bash test_connecting_three_nodes/test.sh
+          bash test_connecting_two_nodes/test.sh
+          bash test_fault_tolerance/test.sh
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Login to Docker Hub
-      run:  |
-        cd message-broker-server/server
-        cat docker_pass.txt | docker login --username sadalibnz --password-stdin
+      - name: Login to Docker Hub
+        run: |
+          cd message-broker-server/server
+          cat docker_pass.txt | docker login --username {{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
-    - name: Build and push Docker image
-      run: |
-        cd message-broker-server/server
-        docker-compose build
-        docker-compose push
+      - name: Build and push Docker image
+        run: |
+          cd message-broker-server/server
+          docker-compose build
+          docker-compose push
