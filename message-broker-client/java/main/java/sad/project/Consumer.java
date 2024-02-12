@@ -45,13 +45,13 @@ public class Consumer {
         return message;
     }
 
-    public void subscribe(Function<Message, Void> function, long intervalMillis) {
+    public <T> void subscribe(Function<Message, T> function, long intervalMillis) {
         Thread subscriberThread = getSubscriberThread(function, intervalMillis);
         subscriberThread.start();
     }
 
 
-    private Thread getSubscriberThread(final Function<Message, Void> function, final long intervalMillis) {
+    private <T> Thread getSubscriberThread(final Function<Message, T> function, final long intervalMillis) {
         return new Thread(() -> {
             while (true) {
                 try {
