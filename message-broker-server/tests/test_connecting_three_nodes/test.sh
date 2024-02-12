@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test for handling test_fault_tolerance nodes
+# Test for handling 3 nodes
 
 BASE_DIR=$(git rev-parse --show-toplevel)/message-broker-server
 

@@ -45,11 +45,11 @@ python $BASE_DIR/server/connect.py &
 sleep 2
 echo $SETTING_PORT 'Connected!'
 
-python $BASE_DIR/tests/3/test_push.py
+python $BASE_DIR/tests/test_fault_tolerance/test_push.py
 
 kill $!
 
-python $BASE_DIR/tests/3/test_pull.py
+python $BASE_DIR/tests/test_fault_tolerance/test_pull.py
 
 rm -r $BASE_DIR/server/8000
 rm -r $BASE_DIR/server/8001
