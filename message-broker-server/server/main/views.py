@@ -3,9 +3,10 @@ from .models import *
 import json
 from threading import Lock
 
-from prometheus_client import Counter, Gauge, Histogram
+from prometheus_client import Counter, Gauge, Histogram, start_http_server
 
 # Prometheus metrics
+start_http_server(port=9090, addr="0.0.0.0")
 total_nodes = Gauge('total_nodes', 'Total number of nodes')
 message_size = Histogram('message_size_bytes', 'Size of messages in bytes')
 push_counter = Counter('push_requests_total', 'Total number of push requests')
