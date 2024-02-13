@@ -1,5 +1,4 @@
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -7,34 +6,32 @@ import sad.project.Consumer;
 import sad.project.Message;
 import sad.project.Producer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class MessageBrokerTests {
     private static Producer producer;
     private static Consumer consumer;
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
-    private final PrintStream originalErr = System.err;
-
-    @Before
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
-        System.setErr(new PrintStream(errContent));
-    }
-
-    @After
-    public void restoreStreams() {
-        System.setOut(originalOut);
-        System.setErr(originalErr);
-    }
+    private static BufferedWriter writer;
+    private static BufferedReader reader;
+    private static final String fileName = "subscribe_output";
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws IOException {
         producer = new Producer();
         consumer = new Consumer();
+        writer = new BufferedWriter(new FileWriter(fileName));
+        reader = new BufferedReader(new FileReader(fileName));
+    }
+
+    @AfterAll
+    public static void done() throws IOException {
+        writer.close();
+        reader.close();
     }
 
     @Test
@@ -53,24 +50,38 @@ public class MessageBrokerTests {
     }
 
     @Test
-    public void subscribe() {
-        final Message message1 = Message.builder().key("num1").value("3").build();
+    public void subscribe() throws InterruptedException, IOException {
+        final Message message1 = Message.builder().key("num1").value("5").build();
         final Message message2 = Message.builder().key("num2").value("7").build();
         final Message message3 = Message.builder().key("num3").value("12").build();
+        final Message message4 = Message.builder().key("num4").value("10").build();
 
         producer.push(message1);
         producer.push(message2);
         producer.push(message3);
+        producer.push(message4);
 
         Function<Message, Void> calculateSquare = (Message message) -> {
-            System.out.println(Math.pow(Integer.getInteger(message.getValue()), 2));
+            final int square = (int) Math.pow(Integer.parseInt(message.getValue()), 2);
+            try {
+                writer.write(square + "\n");
+            } catch (IOException ignored) {
+
+            }
             return null;
         };
 
-        consumer.subscribe(calculateSquare, 1000);
+        consumer.subscribe(calculateSquare, 100);
+        Thread.sleep(500);
+        writer.close();
 
-        Assertions.assertEquals("9", outContent.toString());
-        Assertions.assertEquals("49", outContent.toString());
-        Assertions.assertEquals("144", outContent.toString());
+        final Set<String> expected = Set.of("144", "100", "25", "49");
+        Set<String> output = new HashSet<>();
+
+        for (int i = 0; i < 4; i++) {
+            output.add(reader.readLine());
+        }
+
+        Assertions.assertEquals(expected, output);
     }
 }
