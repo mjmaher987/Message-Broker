@@ -41,6 +41,9 @@ input()
 for i in range(TEST_SIZE//2,TEST_SIZE):
     push(f"{key_seq[i]}", f"{i}".encode(encoding="utf-8"))
 
+import time
+time.sleep(5)
+
 pulled.sort()
 for i in range(TEST_SIZE):
     if pulled[i]!=i:
