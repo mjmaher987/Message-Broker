@@ -30,4 +30,4 @@ def subscribe_thread(action, interval):
         key, value = pull()
         if key:
             action(key, value)
-        time.sleep(interval / 1000)
+        # time.sleep(interval / 1000)
