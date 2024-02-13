@@ -95,7 +95,7 @@ LOGGING = {
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": "server.log",
+            "filename": f"server_{SETTING_PORT}.log",
         },
         "console": {
             "class": "logging.StreamHandler",
