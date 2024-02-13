@@ -1,6 +1,10 @@
 from django.http import HttpResponse
 from .models import *
 import json
+from threading import Lock
+
+
+lock = Lock()
 
 def message(request):
     message = json.loads(request.body)
@@ -56,21 +60,23 @@ def message(request):
 
 def push(request):
     if request.method == 'POST':
-        server = Server.objects.filter(is_leader=True).first()
-        message = json.loads(request.body)
-        key = message['key']
-        value = message['value']
-        server.forward_message({'key': key, 'value': value})
-        return HttpResponse(status=200)
+        with lock:
+            server = Server.objects.filter(is_leader=True).first()
+            message = json.loads(request.body)
+            key = message['key']
+            value = message['value']
+            server.forward_message({'key': key, 'value': value})
+            return HttpResponse(status=200)
     return HttpResponse(status=403)
 
 def pull(request):
     if request.method == 'POST':
-        server = Server.objects.filter(is_leader=True).first()
-        message = server.get_message()
-        if message:
-            return HttpResponse(content=json.dumps(message), status=200)
-        else:
-            return HttpResponse(status=200)
+        with lock:
+            server = Server.objects.filter(is_leader=True).first()
+            message = server.get_message()
+            if message:
+                return HttpResponse(content=json.dumps(message), status=200)
+            else:
+                return HttpResponse(status=200)
     return HttpResponse(status=403)
 

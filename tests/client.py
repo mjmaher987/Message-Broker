@@ -5,7 +5,7 @@ import time
 
 
 BASE_URL = 'http://127.0.0.1:8000/'
-INTERVAL = 500
+INTERVAL = 100
 lock = Lock()
 
 
