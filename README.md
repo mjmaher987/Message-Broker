@@ -56,4 +56,4 @@ docker-compose up
 ```
 
 ## Tests
-You can find and run the predefined tests in the `message-broker-server\tests` directory.
+You can find and run the predefined tests in the `message-broker-server\tests` directory..
